@@ -1,0 +1,25 @@
+services:
+  mcp-server:
+    build: .
+    command: python -m scripts.run_mcp_server
+    ports:
+      - "3001:3001"
+    environment:
+      MOCK_MODE: "true"
+      LOG_LEVEL: "INFO"
+    env_file:
+      - .env
+
+  api:
+    build: .
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    environment:
+      MOCK_MODE: "true"
+      MCP_SERVER_URL: "http://mcp-server:3001"
+      LOG_LEVEL: "INFO"
+    env_file:
+      - .env
+    depends_on:
+      - mcp-server
